@@ -31,18 +31,20 @@ public class TCPServer {
             System.out.println("Well done, the socket is created");
             System.out.println(" ");
 
-            // We wait a client
-            Socket client = socket.accept();
-
-            // We get what is coming in and what we write
-            InputStream input = client.getInputStream();
-            OutputStream output = client.getOutputStream();
-
-            // We manage the input and the output (we manage what we write)
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
 
             while (running) {
+                // We wait a client
+                Socket client = socket.accept();
+
+                // We get what is coming in and what we write
+                InputStream input = client.getInputStream();
+                OutputStream output = client.getOutputStream();
+
+                // We manage the input and the output (we manage what we write)
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
+
+
                 // We get the message from the client
                 String message = reader.readLine();
                 System.out.printf(message);
@@ -54,7 +56,7 @@ public class TCPServer {
                 // There is no message anymore, we stop the connection by closing the socket
                 if (message == null) {
                     // Never forget to close a socket
-                    socket.close();
+                    client.close();
                     System.out.printf("The socket is closed");
                 }
             }
