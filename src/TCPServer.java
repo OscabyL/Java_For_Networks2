@@ -29,7 +29,6 @@ public class TCPServer {
 
         try(ServerSocket socket = new ServerSocket(port);) {
             System.out.println("Well done, the socket is created");
-            System.out.println(" ");
 
 
             while (running) {
@@ -50,8 +49,13 @@ public class TCPServer {
                 System.out.printf(message);
 
                 // We send it back to client with the ip
-                String ip = socket.getInetAddress().getHostAddress();
-                writer.println(ip + " : " + message);
+                // We added another loop in order to read all the different messages from the client without we only read the first one
+                while ((message = reader.readLine()) != null) {
+
+                    System.out.println(message);
+                    String ip = socket.getInetAddress().getHostAddress();
+                    writer.println(ip + " : " + message);
+                }
 
                 // There is no message anymore, we stop the connection by closing the socket
                 if (message == null) {

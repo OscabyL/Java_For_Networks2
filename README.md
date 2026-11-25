@@ -9,7 +9,8 @@ NB : we added a boolean 'running' that can give us the possibility to start a se
 ### Step 2
 
 ### Step 3
-After we finished the TCPServer, we tested it with our terminal. 
+After we finished the TCPServer, we tested it with our terminal.
+
 ![Test_TCP_Server_Step5_CMD_view.png](Diagram/Part1/Test_TCP_Server_Step5_CMD_view.png)
 
 From the terminal view, we are able to connect ourself to the server and then we can write. The server retransmit what we send to it so at least it seems to work properly. 
