@@ -12,6 +12,7 @@ public class TCPServer {
     private int port;
     private boolean running = false;
 
+
     // Generate a TCP server with a given port
     public TCPServer(int port, boolean running) {
         this.port = port;
@@ -24,11 +25,12 @@ public class TCPServer {
         this.running = true;
     }
 
+
     // Start of the lauch function that the server will listen a socker
     public void launch() throws IOException {
 
         try(ServerSocket socket = new ServerSocket(port);) {
-            System.out.println("Well done, the socket is created");
+            System.out.printf("Well done, the socket is created%n");
 
 
             while (running) {
@@ -45,8 +47,7 @@ public class TCPServer {
 
 
                 // We get the message from the client
-                String message = reader.readLine();
-                System.out.printf(message);
+                String message;
 
                 // We send it back to client with the ip
                 // We added another loop in order to read all the different messages from the client without we only read the first one
@@ -61,11 +62,11 @@ public class TCPServer {
                 if (message == null) {
                     // Never forget to close a socket
                     client.close();
-                    System.out.printf("The socket is closed");
+                    System.out.printf("The socket is closed %n");
                 }
             }
         }catch (Exception e){
-            System.out.printf("An error appeared");
+            System.out.printf("An error appeared %n");
 
 
 
@@ -84,9 +85,10 @@ public class TCPServer {
     }
 
 
+
     // Main function that open a port
     public static void main(String[] args) throws Exception{
-        System.out.println("Hello");
+        System.out.println("Hello %n");
 
         // We create the parameters, the server and we launch it
         int port= 8080;

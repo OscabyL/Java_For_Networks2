@@ -7,6 +7,7 @@ The goal of this part is to create a TCP server that will wait for a client. Whe
 We generate the bone of the server. 
 NB : we added a boolean 'running' that can give us the possibility to start a server that is not running (just in case of)
 ### Step 2
+We create the complete launch function. 
 
 ### Step 3
 After we finished the TCPServer, we tested it with our terminal.
@@ -22,3 +23,15 @@ From the server view, we have the messages when the socket is created. When a cl
 However, when we tested that the server remains open after the client disconnexion, we found the server send an error. Indeed, we did not manage well the closing of the sockets. After we manage this issue, we have the two following view and when the client leave, the server remains open and wait for another client. 
 
 ![Case_Working_After_Deconnection.png](Diagram/Part1/Case_Working_After_Deconnection.png)
+
+
+
+
+
+
+
+
+
+## Part 3
+
+
