@@ -7,7 +7,7 @@ public class TCPClient {
     private String host;
     private int port;
 
-    // Constructor: Set the server IP address and port
+    // Set the server IP address and port
     public TCPClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -24,7 +24,7 @@ public class TCPClient {
                         new InputStreamReader(System.in, StandardCharsets.UTF_8)
                 );
 
-                // Receive messages from the server
+                // Receive messages sent by the server
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(
                                 socket.getInputStream(),
@@ -54,12 +54,12 @@ public class TCPClient {
                 // Read keyboard input
                 message = keyboard.readLine();
 
-                // The user enters /quit or closes the standard input
+                // User enters /quit or closes standard input
                 if (message == null || message.equals("/quit")) {
                     break;
                 }
 
-                // Send the message to the server
+                // Send message to the server
                 writer.println(message);
 
                 if (writer.checkError()) {
@@ -67,19 +67,20 @@ public class TCPClient {
                     break;
                 }
 
-                // Receive the response from the server
+                // Receive the server's response
                 String response = reader.readLine();
 
-                // Check if the server has closed the connection
+                // Check whether the server has closed the connection
                 if (response == null) {
                     System.out.println("Server closed the connection.");
                     break;
                 }
 
-                // Display the server response
+                // Display the server's response
                 System.out.println("Server response: " + response);
             }
 
+            // Mangement of all the exectoins
         } catch (UnknownHostException e) {
 
             System.out.println("Error: Server host not found.");
@@ -102,6 +103,7 @@ public class TCPClient {
         }
     }
 
+    // main function that try to connect to the tcp server et the port 8080
     public static void main(String[] args) {
 
         String host = "localhost";
@@ -116,6 +118,7 @@ public class TCPClient {
         }
 
         TCPClient client = new TCPClient(host, port);
+
         client.start();
     }
 }
