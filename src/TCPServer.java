@@ -59,7 +59,7 @@ public class TCPServer {
                 }
             }
         }catch (Exception e){
-            System.out.printf("An erro appeared");
+            System.out.printf("An error appeared");
 
 
 
