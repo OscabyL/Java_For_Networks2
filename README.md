@@ -7,7 +7,7 @@ The goal of this part is to create a TCP server that will wait for a client. Whe
 We generate the bone of the server. 
 NB : we added a boolean 'running' that can give us the possibility to start a server that is not running (just in case of)
 ### Step 2
-We create the complete launch function. 
+We create the complete launch function. This function is working at two level. Firstly there is the connection with the client. 
 
 ### Step 3
 After we finished the TCPServer, we tested it with our terminal.
