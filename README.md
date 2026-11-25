@@ -52,5 +52,10 @@ Then we send the first message
 - nb 532 : ACK from the client 
 
 Then we send the second message
-nb 749 - 750 is the same logic except we lost a ACK packet 
+nb 749 - 751 is the same logic except we do not have a second packet for the acknowledgment. Indeed, we notice a mechanism known as : Piggybacking that use the packet 750 an acknowledgment and also send data.
+
+Finally, we have the disconnect act :
+- nb 864 : FIN from the client 
+- nb 865 : FIN from the serven
+- nb 866 : a final ACK that terminate the connection between this server and this client
 
