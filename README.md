@@ -155,3 +155,66 @@ Finally, we have the disconnect act :
 - nb 865 : FIN from the serven
 - nb 866 : a final ACK that terminate the connection between this server and this client
 
+
+
+
+
+## Part 4
+
+The goal of this part is to extend the TCP server with message history and client identification. We create two additional classes, `TCPAdvancedServer` and `TCPAdvancedClient`, using port 8082.
+
+### Step 13
+
+In this step, we implement a message history function. The server uses an `ArrayList` to store the last 10 messages received from all clients.
+
+Each time the server receives a new message, it adds the message to the history. If the number of messages is greater than 10, the oldest message is removed.
+
+First, we connect the first client to the server and send 12 messages.
+
+![First Client](Diagram/Part3/step13_client1.png)
+
+After the first client disconnects, we start a second client.
+
+![Second Client History](Diagram/Part3/step13_client2_history.png)
+
+The second client automatically receives the last 10 messages stored by the server. The first two messages are removed from the history.
+
+![Server History](Diagram/Part3/step13_server.png)
+
+From the server view, we can observe that the history stores a maximum of 10 messages. When a new client connects, the server sends the stored messages before starting normal communication.
+
+**Question: What problem could occur if several threads access the history at the same time?**
+
+If several threads access and modify the same history list at the same time, a race condition may occur.
+
+Some messages may be lost, or the history may become inconsistent. In TP 4, synchronization can be used to protect the shared list and ensure thread safety.
+
+### Step 14
+
+In this step, we implement client identification and session monitoring.
+
+The server assigns a unique ID to each new client during its execution. The ID increases each time a new client is accepted.
+
+We use `LocalDateTime.now()` to record the connection and disconnection timestamps. We also use `Duration.between()` to calculate the duration of each session.
+
+![Client Identification](Diagram/Part4/step14_client_identification.png)
+
+From the server view, we can observe the different client IDs, connection timestamps, disconnection timestamps and session durations.
+
+In our experiment, Client #1 connects to the server and sends the message `Hello Server`. The session lasts 25 seconds.
+
+After Client #1 disconnects, Client #2 connects to the server with a different ID and sends another message.
+
+This function allows the server to identify different clients and monitor their sessions. It will also be useful when implementing a multithreaded TCP server in TP 4.
+
+## Conclusion
+
+In this lab, we implemented a TCP client and server using Java sockets. We tested message transmission, character encoding, error handling, multiple connections and client disconnection.
+
+We also used Wireshark to observe the three-way handshake, data transmission, acknowledgments and connection termination.
+
+By comparing TCP and UDP, we observed that TCP provides reliable and ordered byte-stream communication, while UDP provides connectionless datagram communication with lower protocol overhead.
+
+Finally, we extended the TCP server with message history and client identification.
+
+The current TCP server can only handle one client at a time. In the next lab, we will use multithreading to allow several clients to communicate with the server simultaneously.
