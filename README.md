@@ -34,4 +34,23 @@ However, when we tested that the server remains open after the client disconnexi
 
 ## Part 3
 
+### Step 9 
+
+In this part, we observe the flow of data between the two interfaces. We use wireshark to observe the traffic of the connection, the exchange of two messages and the disconnect act. 
+![TCP_Load.png](Diagram/Part3/TCP_Load.png)
+In this capture we have in total 13 exchange : 
+
+The 3 first and the 3-handshake
+- nb 266 : first SYN from the client
+- nb 267 : response from the server to the client (SYN + ACK)
+- nb 268 : acknowledgment of the client
+
+Then we send the first message
+- nb 529 : push of message 1 from the client 
+- nb 530 : ACK from the server 
+- nb 531 : the server retransmit the data sent and its ip to the client
+- nb 532 : ACK from the client 
+
+Then we send the second message
+nb 749 - 750 is the same logic except we lost a ACK packet 
 
