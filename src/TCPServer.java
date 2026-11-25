@@ -1,93 +1,112 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.io.*;
-
 
 public class TCPServer {
 
+    // 服务器监听的端口
     private int port;
-    private boolean running = false;
 
-    // Generate a TCP server with a given port
-    public TCPServer(int port, boolean running) {
+    // 构造函数：指定端口
+    public TCPServer(int port) {
         this.port = port;
-        this.running = running;
     }
 
-    // Generate a TCP server with a default port
+    // 默认构造函数：使用8080端口
     public TCPServer() {
-        this.port = 8080;
-        this.running = true;
+        this(8080);
     }
 
-    // Start of the lauch function that the server will listen a socker
-    public void launch() throws IOException {
-
-        try(ServerSocket socket = new ServerSocket(port);) {
-            System.out.println("Well done, the socket is created");
-            System.out.println(" ");
-
-
-            while (running) {
-                // We wait a client
-                Socket client = socket.accept();
-
-                // We get what is coming in and what we write
-                InputStream input = client.getInputStream();
-                OutputStream output = client.getOutputStream();
-
-                // We manage the input and the output (we manage what we write)
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
-
-
-                // We get the message from the client
-                String message = reader.readLine();
-                System.out.printf(message);
-
-                // We send it back to client with the ip
-                String ip = socket.getInetAddress().getHostAddress();
-                writer.println(ip + " : " + message);
-
-                // There is no message anymore, we stop the connection by closing the socket
-                if (message == null) {
-                    // Never forget to close a socket
-                    client.close();
-                    System.out.printf("The socket is closed");
-                }
-            }
-        }catch (Exception e){
-            System.out.printf("An error appeared");
-
-
-
-        }
-
-
-
-
-
-    }
-
-    // Overide the soString function
+    // 描述服务器信息
     @Override
     public String toString() {
-        return "UDPServer: port=" + port ;
+        return "TCP Server listening on port " + port;
     }
 
+    // 启动服务器
+    public void launch() {
 
-    // Main function that open a port
-    public static void main(String[] args) throws Exception{
-        System.out.println("Hello");
+        // 创建ServerSocket
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-        // We create the parameters, the server and we launch it
-        int port= 8080;
-        boolean running = true;
-        TCPServer server = new TCPServer(port, running);
+            System.out.println(this);
+            System.out.println("Server is waiting for clients...");
+
+            // 服务器一直运行
+            while (true) {
+
+                // 等待客户端建立连接
+                Socket socket = serverSocket.accept();
+
+                // 获取客户端IP地址
+                String clientIP = socket.getInetAddress().getHostAddress();
+
+                System.out.println("Client connected: " + clientIP);
+
+                // 处理当前客户端
+                try (
+                        Socket clientSocket = socket;
+
+                        // 创建输入流，用于接收消息
+                        BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(
+                                        clientSocket.getInputStream(),
+                                        StandardCharsets.UTF_8
+                                )
+                        );
+
+                        // 创建输出流，用于发送消息
+                        PrintWriter writer = new PrintWriter(
+                                new OutputStreamWriter(
+                                        clientSocket.getOutputStream(),
+                                        StandardCharsets.UTF_8
+                                ),
+                                true
+                        )
+                ) {
+
+                    String message;
+
+                    // 不断读取客户端发送的消息
+                    while ((message = reader.readLine()) != null) {
+
+                        // 显示接收到的消息
+                        System.out.println("Received: " + message);
+
+                        // 回复客户端：IP地址 + 原始消息
+                        writer.println(clientIP + ": " + message);
+                    }
+
+                } catch (IOException e) {
+
+                    // 一个客户端出现错误，不影响整个服务器
+                    System.out.println("Client error: " + e.getMessage());
+
+                } finally {
+
+                    System.out.println("Client disconnected: " + clientIP);
+                    System.out.println("Server is waiting for clients...");
+                }
+            }
+
+        } catch (IOException e) {
+
+            System.out.println("Server error: " + e.getMessage());
+        }
+    }
+
+    // Java程序入口
+    public static void main(String[] args) {
+
+        int port = 8080;
+
+        // 如果用户输入了端口号，则使用指定端口
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+        }
+
+        TCPServer server = new TCPServer(port);
 
         server.launch();
     }
