@@ -1,100 +1,111 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.io.*;
-
 
 public class TCPServer {
 
+    // Port on which the server listens
     private int port;
-    private boolean running = false;
 
-
-    // Generate a TCP server with a given port
-    public TCPServer(int port, boolean running) {
+    // Constructor: Set the specified port
+    public TCPServer(int port) {
         this.port = port;
-        this.running = running;
     }
 
-    // Generate a TCP server with a default port
+    // Default constructor: Use port 8080
     public TCPServer() {
-        this.port = 8080;
-        this.running = true;
+        this(8080);
     }
 
-
-    // Start of the lauch function that the server will listen a socker
-    public void launch() throws IOException {
-
-        try(ServerSocket socket = new ServerSocket(port);) {
-            System.out.printf("Well done, the socket is created%n");
-
-
-            while (running) {
-                // We wait a client
-                Socket client = socket.accept();
-
-                // We get what is coming in and what we write
-                InputStream input = client.getInputStream();
-                OutputStream output = client.getOutputStream();
-
-                // We manage the input and the output (we manage what we write)
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true);
-
-
-                // We get the message from the client
-                String message;
-
-                // We send it back to client with the ip
-                // We added another loop in order to read all the different messages from the client without we only read the first one
-                while ((message = reader.readLine()) != null) {
-
-                    System.out.println(message);
-                    String ip = socket.getInetAddress().getHostAddress();
-                    writer.println(ip + " : " + message);
-                }
-
-                // There is no message anymore, we stop the connection by closing the socket
-                if (message == null) {
-                    // Never forget to close a socket
-                    client.close();
-                    System.out.printf("The socket is closed %n");
-                }
-            }
-        }catch (Exception e){
-            System.out.printf("An error appeared %n");
-
-
-
-        }
-
-
-
-
-
-    }
-
-    // Overide the soString function
+    // Describe the server information
     @Override
     public String toString() {
-        return "UDPServer: port=" + port ;
+        return "TCP Server listening on port " + port;
     }
 
+    // Start the server
+    public void launch() {
 
+        // Create a ServerSocket
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-    // Main function that open a port
-    public static void main(String[] args) throws Exception{
-        System.out.println("Hello %n");
+            System.out.println(this);
+            System.out.println("Server is waiting for clients...");
 
-        // We create the parameters, the server and we launch it
-        int port= 8080;
-        boolean running = true;
-        TCPServer server = new TCPServer(port, running);
+            // Keep the server running
+            while (true) {
 
+                // Wait for a client connection
+                Socket socket = serverSocket.accept();
+
+                // Get the client's IP address
+                String clientIP = socket.getInetAddress().getHostAddress();
+
+                System.out.println("Client connected: " + clientIP);
+
+                // Handle the current client
+                try (
+                        Socket clientSocket = socket;
+
+                        // Create an input stream to receive messages
+                        BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(
+                                        clientSocket.getInputStream(),
+                                        StandardCharsets.UTF_8
+                                )
+                        );
+
+                        // Create an output stream to send messages
+                        PrintWriter writer = new PrintWriter(
+                                new OutputStreamWriter(
+                                        clientSocket.getOutputStream(),
+                                        StandardCharsets.UTF_8
+                                ),
+                                true
+                        )
+                ) {
+
+                    String message;
+
+                    // Continuously read messages from the client
+                    while ((message = reader.readLine()) != null) {
+
+                        // Display the received message
+                        System.out.println("Received: " + message);
+
+                        // Reply to the client: IP address + original message
+                        writer.println(clientIP + ": " + message);
+                    }
+
+                } catch (IOException e) {
+
+                    // A client error does not affect the entire server
+                    System.out.println("Client error: " + e.getMessage());
+
+                } finally {
+
+                    System.out.println("Client disconnected: " + clientIP);
+                    System.out.println("Server is waiting for clients...");
+                }
+            }
+
+        } catch (IOException e) {
+
+            System.out.println("Server error: " + e.getMessage());
+        }
+    }
+
+    // Entry point of the Java program
+    public static void main(String[] args) {
+
+        int port = 8080;
+
+        // Use the specified port if the user provides one
+        if (args.length > 0) {
+            port = Integer.parseInt(args[0]);
+        }
+
+        TCPServer server = new TCPServer(port);
         server.launch();
     }
 }
