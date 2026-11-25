@@ -59,3 +59,7 @@ Finally, we have the disconnect act :
 - nb 865 : FIN from the serven
 - nb 866 : a final ACK that terminate the connection between this server and this client
 
+If we consider a UDP server that also retransmit the client's message to client, it will take only 4 packets to do so. Here, with the TCP server, the number of exchange is 13. 
+
+### Step 10
+
