@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +7,7 @@ public class TCPClient {
     private String host;
     private int port;
 
-    // 构造函数：设置服务器IP地址和端口
+    // Set the server IP address and port
     public TCPClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -16,16 +15,16 @@ public class TCPClient {
 
     public void start() {
 
-        // 建立TCP连接
+        // Establish a TCP connection
         try (
                 Socket socket = new Socket(host, port);
 
-                // 读取用户通过键盘输入的内容
+                // Read user input from the keyboard
                 BufferedReader keyboard = new BufferedReader(
                         new InputStreamReader(System.in, StandardCharsets.UTF_8)
                 );
 
-                // 接收服务器发送的消息
+                // Receive messages sent by the server
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(
                                 socket.getInputStream(),
@@ -33,7 +32,7 @@ public class TCPClient {
                         )
                 );
 
-                // 向服务器发送消息
+                // Send messages to the server
                 PrintWriter writer = new PrintWriter(
                         new OutputStreamWriter(
                                 socket.getOutputStream(),
@@ -42,11 +41,6 @@ public class TCPClient {
                         true
                 )
         ) {
-
-
-
-
-
 
             System.out.println("Connected to server: " + host + ":" + port);
             System.out.println("Type /quit to disconnect.");
@@ -57,15 +51,15 @@ public class TCPClient {
 
                 System.out.print("Enter message: ");
 
-                // 读取键盘输入
+                // Read keyboard input
                 message = keyboard.readLine();
 
-                // 用户输入 /quit 或关闭标准输入
+                // User enters /quit or closes standard input
                 if (message == null || message.equals("/quit")) {
                     break;
                 }
 
-                // 向服务器发送消息
+                // Send message to the server
                 writer.println(message);
 
                 if (writer.checkError()) {
@@ -73,19 +67,20 @@ public class TCPClient {
                     break;
                 }
 
-                // 接收服务器的回复
+                // Receive the server's response
                 String response = reader.readLine();
 
-                // 检查服务器是否关闭连接
+                // Check whether the server has closed the connection
                 if (response == null) {
                     System.out.println("Server closed the connection.");
                     break;
                 }
 
-                // 显示服务器的回复
+                // Display the server's response
                 System.out.println("Server response: " + response);
             }
 
+            // Mangement of all the exectoins
         } catch (UnknownHostException e) {
 
             System.out.println("Error: Server host not found.");
@@ -108,6 +103,7 @@ public class TCPClient {
         }
     }
 
+    // main function that try to connect to the tcp server et the port 8080
     public static void main(String[] args) {
 
         String host = "localhost";
