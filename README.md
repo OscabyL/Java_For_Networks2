@@ -156,6 +156,111 @@ Finally, we have the disconnect act :
 - nb 866 : a final ACK that terminate the connection between this server and this client
 
 
+### Step 10
+
+The goal of this step is to understand the difference between TCP byte streams and UDP datagrams.
+
+We create two new classes, `TCPStreamServer` and `TCPStreamClient`, using port 8081. The server uses a buffer of 1024 bytes and waits for one second before reading the data.
+
+**Test 1 - Multiple Short Messages**
+
+The client sends three short messages, `Hello`, `World` and `Java`, using three consecutive `write()` calls without line breaks. The total amount of data sent is 14 bytes.
+
+**Test 2 - One Large Message**
+
+The client sends a block of 10000 bytes using a single `write()` call.
+
+![TCP Stream Client](Diagram/Part3/step10_stream_client.png)
+
+From the client view, the first test uses three write operations, while the second test uses only one write operation.
+
+![TCP Stream Server](Diagram/Part3/step10_stream_server.png)
+
+From the server view, we observe that the block of 10000 bytes is received using 10 data-reading operations.
+
+The first nine operations receive 1024 bytes each, and the last operation receives 784 bytes.
+
+`9 x 1024 + 784 = 10000 bytes`
+
+| Test | Write calls | Bytes sent |
+|------|------------:|-----------:|
+| Multiple short messages | 3 | 14 |
+| One large message | 1 | 10000 |
+
+This experiment shows that TCP does not preserve message boundaries. Several write operations can be combined into one read operation, and one large write operation can be divided into several read operations.
+
+In the previous parts, we use `println()` and `readLine()`. The newline character separates different messages and allows the receiver to identify each complete message.
+
+### Step 11
+
+In this step, we compare the behavior of TCP and UDP when the server is not running.
+
+**TCP Error**
+
+We stop the TCP server and try to connect using the TCP client.
+
+![TCP Connection Error](Diagram/Part3/step11_tcp_error.png)
+
+The client displays a connection error because TCP requires a connection before sending messages.
+
+TCP can also detect when the other side closes or resets an existing connection during network operations.
+
+**UDP Error**
+
+We create a new Java class named `UDPErrorTest` to compare an unconnected UDP socket and a connected UDP socket.
+
+We configure a timeout of 3000 milliseconds to avoid waiting indefinitely for a response.
+
+![UDP Error Test](Diagram/Part3/step11_udp_error.png)
+
+We obtain the following results:
+
+| Test | Message sent | Result |
+|------|--------------|--------|
+| Unconnected UDP | Yes | Timeout |
+| Connected UDP | Yes | Timeout |
+
+In both tests, the client can send a UDP message even when the server is not running. However, no response is received.
+
+Calling `connect()` on a UDP socket does not establish a real connection like TCP. It only specifies the remote IP address and port.
+
+**ICMP Analysis**
+
+We use Wireshark to observe the UDP packets and possible ICMP error messages.
+
+![ICMP Capture](Diagram/Part3/step11_icmp_capture.png)
+
+Two UDP packets are sent to port 8080. Each packet contains the message `Hello UDP`, with a payload of 9 bytes.
+
+No ICMP Port Unreachable message related to these two packets is observed in our capture.
+
+A connected UDP socket may report a `PortUnreachableException`, but this behavior is not guaranteed. In our Windows experiment, both UDP tests end with a timeout.
+
+Unlike TCP, UDP has no connection termination mechanism. If the server stops, the UDP client does not automatically receive a disconnection notification.
+
+### Step 12(a)
+
+**Which mechanisms of TCP did we have to re-implement over UDP in TP 2? Which ones did we get for free here?**
+
+In TP 2, we use sequence numbers to identify UDP packets and detect packet loss. To provide reliable communication over UDP, acknowledgments and retransmissions also need to be implemented at the application level.
+
+With TCP, these mechanisms are already provided by the transport layer.
+
+TCP automatically provides sequence numbers, acknowledgments, retransmissions, ordered delivery, flow control and congestion control.
+
+Therefore, we do not need to implement these mechanisms manually in our TCP application.
+
+### Step 12(b)
+
+**For which applications would we choose UDP rather than TCP, and why?**
+
+We would choose UDP for real-time applications such as online gaming, video conferencing, live streaming and VoIP.
+
+These applications require low latency and can tolerate some packet loss. UDP does not require connection establishment and automatic retransmissions, which can reduce delays.
+
+For example, during a video call, it is often better to receive the next video frame than to wait for the retransmission of an old frame.
+
+TCP is more suitable for applications such as file transfers, where reliable and ordered data delivery is important.
 
 
 
